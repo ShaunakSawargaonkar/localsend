@@ -10,11 +10,13 @@ import 'package:logging/logging.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:saf_stream/saf_stream.dart';
+import 'package:saf_util/saf_util.dart';
 import 'package:saf_stream/saf_stream_platform_interface.dart';
 
 final _logger = Logger('FileSaver');
 
 final _saf = SafStream();
+final _safUtilPlugin = SafUtil();
 
 /// Saves the data [stream] to the [destinationPath].
 /// [onProgress] will be called on every 100 ms.
@@ -30,12 +32,42 @@ Future<void> saveFile({
   required DateTime? lastAccessed,
   required void Function(int savedBytes) onProgress,
 }) async {
+  
+      print('existsssss3');
   if (!saveToGallery && androidSdkInt != null) {
+    
+
     // Use SAF to save the file
     // When saveToGallery is enabled, the destination is always the app's cache directory so we don't need to use SAF
     SafWriteStreamInfo? safInfo;
 
+    // Check folder existence
+
+    final fullTargetUri = documentUri ?? destinationPath;
+       final folderUri = fullTargetUri.endsWith(name)
+      ? fullTargetUri.substring(0, fullTargetUri.length - name.length)
+      : fullTargetUri;
+
+      // Step 1: Check if the folder exists via SAF
+      
+      final folderExists = await _safUtilPlugin.exists(folderUri, true);
+
+      if(folderExists){
+        print('Folder existsssss: $folderUri , documentUri: $documentUri, destinationPath: $destinationPath');
+      }
+      else{
+        print('Folder does not existsssss: $folderUri , documentUri: $documentUri, destinationPath: $destinationPath');
+        final folderUriNew = await _safUtilPlugin.pickDirectory(
+                      writePermission: true,
+                      initialUri: documentUri,
+                      persistablePermission: false);
+        print('Folder URI after picking: $folderUriNew');
+        documentUri = folderUriNew?.uri;
+      }
+// Check folder existence
+
     if (documentUri != null || destinationPath.startsWith('content://')) {
+      print('existsssss2');
       _logger.info('Using SAF to save file to ${documentUri ?? destinationPath} as $name');
       safInfo = await _saf.startWriteStream(
         documentUri ?? destinationPath,
@@ -57,6 +89,9 @@ Future<void> saveFile({
     }
 
     if (safInfo != null) {
+
+      
+
       final sessionID = safInfo.session;
       await _saveFile(
         destinationPath: destinationPath,
@@ -77,6 +112,7 @@ Future<void> saveFile({
     }
   }
 
+      print('existsssss');
   final file = File(destinationPath);
   final sink = file.openWrite();
   await _saveFile(

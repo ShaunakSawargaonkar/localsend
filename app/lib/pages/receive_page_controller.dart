@@ -112,6 +112,7 @@ class InitReceivePageAction extends ReduxAction<ReceivePageController, ReceivePa
       isLink: receiveSession.message != null && (receiveSession.message!.isLink),
       showFullIp: false,
       onAccept: () async {
+        print('Beforeeeee profress page page:');
         if (state.message != null) {
           // accept nothing
           notifier._server.acceptFileRequest({});

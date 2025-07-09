@@ -142,6 +142,10 @@ ColorScheme _determineColorScheme(ColorMode mode, Brightness brightness, Dynamic
         surface: Colors.black,
       ),
     ColorMode.yaru => throw 'Should reach here',
+    ColorMode.Shaunak => ColorScheme.fromSeed(
+        seedColor: const Color.fromARGB(255, 255, 2, 2), // Example seed color
+        brightness: brightness,
+      ),
   };
 
   return colorScheme ?? defaultColorScheme;

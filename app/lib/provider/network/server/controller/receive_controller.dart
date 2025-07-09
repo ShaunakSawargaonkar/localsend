@@ -347,6 +347,8 @@ class ReceiveController {
     );
 
     if (quickSave) {
+      
+      print('Beforeeeee profress page: $sessionId');
       // ignore: use_build_context_synchronously, unawaited_futures
       Routerino.context.pushImmediately(() => ProgressPage(
             showAppBar: false,
@@ -458,6 +460,8 @@ class ReceiveController {
       outerDestinationPath = destinationPath;
 
       _logger.info('Saving ${receivingFile.file.fileName} to $destinationPath');
+
+      print('before saving ${receivingFile.file.fileName} to $destinationPath');
 
       await saveFile(
         destinationPath: destinationPath,
