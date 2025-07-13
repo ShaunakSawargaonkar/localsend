@@ -22,7 +22,9 @@ Future<PickDirectoryResult?> pickDirectoryAndroid() async {
 
   return PickDirectoryResultMapper.fromJson({
     'directoryUri': result['directoryUri'],
-    'files': (result['files'] as List).map((e) => FileInfoMapper.fromJson((e as Map).cast<String, dynamic>())).toList(),
+    'files': (result['files'] as List)
+        .map((e) => FileInfoMapper.fromJson((e as Map).cast<String, dynamic>()))
+        .toList(),
   });
 }
 
@@ -37,7 +39,9 @@ Future<List<FileInfo>?> pickFilesAndroid() async {
     return null;
   }
 
-  return result.map((e) => FileInfoMapper.fromJson((e as Map).cast<String, dynamic>())).toList();
+  return result
+      .map((e) => FileInfoMapper.fromJson((e as Map).cast<String, dynamic>()))
+      .toList();
 }
 
 Future<bool> getSystemAnimationsStatusAndroid() async {
@@ -48,6 +52,8 @@ Future<void> createDirectory({
   required String documentUri,
   required String directoryName,
 }) async {
+  print(
+      "Testttttttt Insideeeeeee createDirectory to kotline: $documentUri, $directoryName");
   _logger.info('Creating directory "$directoryName" in $documentUri');
   await _methodChannel.invokeMethod('createDirectory', {
     'documentUri': documentUri,
@@ -60,20 +66,29 @@ Future<void> createMissingDirectoriesAndroid({
   required String fileName,
   required Set<String> createdDirectories,
 }) async {
+  print(
+      "Testttttttt Insideeeeeee createMissingDirectoriesAndroid to kotline: ");
   final parts = fileName.split('/');
   for (int i = 0; i < parts.length - 1; i++) {
     final subDirPath = parts.sublist(0, i + 1).join('/');
+    print(
+        "Testttttttt Insideeeeeee createMissingDirectoriesAndroid to subDirPath: $subDirPath ");
     if (createdDirectories.contains(subDirPath)) {
       continue;
     }
 
-    await createDirectory(
-      documentUri: ContentUriHelper.convertTreeUriToDocumentUri(
-        treeUri: parentUri,
-        suffix: i == 0 ? null : parts.sublist(0, i).join('/'),
-      ),
-      directoryName: parts[i],
-    );
+    try {
+      await createDirectory(
+        documentUri: ContentUriHelper.convertTreeUriToDocumentUri(
+          treeUri: parentUri,
+          suffix: i == 0 ? null : parts.sublist(0, i).join('/'),
+        ),
+        directoryName: parts[i],
+      );
+    } catch (e) {
+      print(
+          ' Testttttttt Could not create missing directories for inside channel ');
+    }
     createdDirectories.add(subDirPath);
   }
 }
